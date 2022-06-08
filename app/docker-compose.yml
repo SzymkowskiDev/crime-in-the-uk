@@ -4,7 +4,7 @@ services:
   api:
     build:
       context: "./api"
-      dockerfile: "app.dockerfile"
+      dockerfile: "api.dockerfile"
     container_name: fastapi-api
     environment:
       PORT: 8000
@@ -23,22 +23,27 @@ services:
       - '5432:5432'
     volumes:
       - sql-final-data:/var/lib/postgres/pgdata
+    environment:
+      POSTGRES_PASSWORD: abc123
 
   mongo_raw:
     build:
       context: "./mongo_raw"
       dockerfile: "mongo_raw.dockerfile"
     container_name: mongo_raw
-    # ports:
-    #   -
+    ports:
+      - 27017:27017
     volumes:
-      - mongo-raw-data:/var/lib/
-  
+      - mongo-raw-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: abc123
+
   ingestor:
     build:
       context: "./ingestor"
-      dockerfile: "ingestion.dockerfile"
-    container_name: ingestion_to_raw
+      dockerfile: "ingestor.dockerfile"
+    container_name: ingestor_to_raw
     restart: "no"
     depends_on:
     - raw
