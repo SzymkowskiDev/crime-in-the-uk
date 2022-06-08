@@ -1,0 +1,57 @@
+version: "3"
+
+services:
+  api:
+    build:
+      context: "./api"
+      dockerfile: "app.dockerfile"
+    container_name: fastapi-api
+    environment:
+      PORT: 8000
+    ports:
+      - '8000:8000'
+    restart: "no"
+    depends_on:
+    - db
+    
+  postgres_final:
+    build: 
+      context: "./postgres_final"
+      dockerfile: "postgres_final.dockerfile"
+    container_name: postgres_final
+    ports:
+      - '5432:5432'
+    volumes:
+      - sql-final-data:/var/lib/postgres/pgdata
+
+  mongo_raw:
+    build:
+      context: "./mongo_raw"
+      dockerfile: "mongo_raw.dockerfile"
+    container_name: mongo_raw
+    # ports:
+    #   -
+    volumes:
+      - mongo-raw-data:/var/lib/
+  
+  ingestor:
+    build:
+      context: "./ingestor"
+      dockerfile: "ingestion.dockerfile"
+    container_name: ingestion_to_raw
+    restart: "no"
+    depends_on:
+    - raw
+
+  spark:
+    build:
+      context: "./spark"
+      dockerfile: "spark.dockerfile"
+    container_name: spark
+    restart: "no"
+    depends_on:
+    - raw
+volumes:
+  sql-final-data:
+  mongo-raw-data:
+
