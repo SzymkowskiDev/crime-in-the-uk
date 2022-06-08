@@ -1,5 +1,5 @@
 FROM postgres
-ENV POSTGRES_PASSWORD=abc123
+
 
 
 # LABEL creator="Dawid G."
