@@ -1,5 +1,5 @@
 FROM postgres
-
+COPY init.db.sh /tmp/
 
 
 # LABEL creator="Dawid G."
