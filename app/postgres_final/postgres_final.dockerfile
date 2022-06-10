@@ -2,7 +2,7 @@ FROM postgres
 COPY init.db.sh /tmp/
 
 
-# LABEL creator="Dawid G."
+LABEL creator="Dawid G."
 
 # RUN psql -U postgres
 # RUN CREATE DATABASE testabc
