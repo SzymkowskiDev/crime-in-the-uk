@@ -32,7 +32,7 @@ services:
       dockerfile: "mongo_raw.dockerfile"
     container_name: mongo_raw
     ports:
-      - 27017:27017
+      - 27018:27017
     volumes:
       - mongo-raw-data:/data/db
     environment:
