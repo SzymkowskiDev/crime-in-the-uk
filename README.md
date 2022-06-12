@@ -3,23 +3,46 @@
 📊 Size, dependencies, version, code coverage
 
 Project focused on crime processing in UK.
+The idea is to taking data from https://crimestoppers-uk.org/ which is UK charity website, focused on
+providing information about crimes, and rewards for providing informations about perpetrators of crimes.
+
+The project purpose is to harvest information from website, store content in MongoDB, then process it with
+Spark, to find context of each article using SparkML. The processed data is then added to Postgres, which serve as source for Power BI and API for data access and further analyse. 
 
 ## Contents
-Table of contents goes here
+
+Containers explained:
+
+api - data enpoint, where FastAPI and SQLAlchemy are used to access the data.
+
+ingestor - container which loops over articles, after there is new article spotted, it's content is then added 
+to mongodb
+
+mongo_raw - mongodb serving the project as raw storage of data
+
+postgres_final - postgres database which is used by Power BI and api to access the final data
+
+spark - responsible for processing raw data to find insights about articles, for example:
+    • what type of crime was commited? 
+    • what is the reward for providing information?
+    • what was the location of event?
+
 
 ## 📋 Requirements
-Sth.
+Docker Desktop
+Power BI Desktop for dashboard
 
 ## ⭐ Features
 Introductory sentance.
 
 ⭐ **Feature 1**
 
-Description of feature 1.
+Data analytics report to freely analyze stored content
+<!-- *insert images when report is created* -->
 
 ⭐ **Feature 2**
 
-Description of feature 2.
+Api access to SQL database
 
 ## 📝 Examples
 **Example 1. Title**
