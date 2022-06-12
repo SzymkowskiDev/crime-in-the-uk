@@ -23,9 +23,9 @@ mongo_raw - mongodb serving the project as raw storage of data
 postgres_final - postgres database which is used by Power BI and api to access the final data
 
 spark - responsible for processing raw data to find insights about articles, for example:
-    • what type of crime was commited? 
-    • what is the reward for providing information?
-    • what was the location of event?
+<br />  • what type of crime was commited?
+<br />  • what is the reward for providing information?
+<br />  • what was the location of event?
 
 
 ## 📋 Requirements
