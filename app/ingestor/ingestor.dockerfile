@@ -1,14 +1,21 @@
-FROM python:3.9-alpine
+FROM python:3.9
 
-# WORKDIR /app
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y netcat-openbsd gcc && \
+    apt-get clean
 
 # RUN apt update
+# && apt install build-base
+#  && add python3-dev libpq-dev && apk add build-base
 
-# COPY app/requirements.txt ./
-# RUN pip install --no-cache-dir -r requirements.txt
 
-# # RUN mkdir ./app
+RUN pip install --upgrade pip
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
-# COPY ./app ./app
 
-# CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+COPY . ./app
+RUN cd /app 
+
+CMD ["python3", "/app/main.py"]

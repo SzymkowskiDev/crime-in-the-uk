@@ -2,6 +2,8 @@ from base import dal
 import time
 import datetime
 
+def scrapper():
+    pass
 
 def checkForArticle(myClient,content):
     appdb = myClient["web_content"]
@@ -29,7 +31,8 @@ def insertArticle(myClient, dateTime):
 
 
 def proc(myClient):
-        if checkForArticle(myClient, content = ("NY")) == True:
+        # content = scrapper check on scrape level if article exist in db
+        # if checkForArticle(myClient, content = ("NY")) == True:
             insertArticle(myClient, dateTime = datetime.datetime.now())
 
 if __name__ == '__main__':
