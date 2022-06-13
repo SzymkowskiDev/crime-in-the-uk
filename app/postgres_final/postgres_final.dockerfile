@@ -1,6 +1,6 @@
 FROM postgres
 COPY init.db.sh /tmp/
-COPY hello.sh /tmp/
+# COPY hello.sh /tmp/
 ENV POSTGRES_PASSWORD=abc123
 LABEL creator="Dawid G."
 
