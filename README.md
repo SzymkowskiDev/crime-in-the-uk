@@ -1,13 +1,12 @@
 
-# Project Title
-📊 Size, dependencies, version, code coverage
+# Crime in the UK (data project)
 
-Project focused on crime processing in UK.
-The idea is to taking data from https://crimestoppers-uk.org/ which is UK charity website, focused on
+The project is focused on processing crime in the UK.
+The idea is to take data from https://crimestoppers-uk.org/ which is UK charity website, focused on
 providing information about crimes, and rewards for providing informations about perpetrators of crimes.
 
-The project purpose is to harvest information from website, store content in MongoDB, then process it with
-Spark, to find context of each article using SparkML. The processed data is then added to Postgres, which serve as source for Power BI and API for data access and further analyse. 
+The project's purpose is to harvest information from the website, store its content in MongoDB, and then process it with
+Spark, in order to find context of each article using SparkML. The processed data is then added to Postgres, which serves as source for Power BI and API for data access and further analysis. 
 
 ## Contents
 
