@@ -1,6 +1,8 @@
 from fastapi import FastAPI
-from .base import dal
 from sqlalchemy import select
+try: from base import dal
+except: from .base import dal
+
 app = FastAPI()
 
 if dal.connection == None:

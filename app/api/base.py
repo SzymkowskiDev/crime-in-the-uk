@@ -4,6 +4,7 @@ from sqlalchemy import (create_engine,MetaData,Table, Column, Integer, Numeric, 
 
 from datetime import datetime
 
+#postgresql://username:password@host:port/dbname[?paramspec]
 
 class DataAccessLayer:
     connection = None
@@ -16,7 +17,8 @@ class DataAccessLayer:
         Column('category',String(30),nullable=False)
         )
     def db_init(self):
-        conn_string = "postgresql+psycopg2://postgres_final:abc123@db/postgres"
+        conn_string = "postgresql+psycopg2://app_user:abc123@postgres_final:5432/postgres"
+        # postgresql+psycopg2://root:abc123@postgres_final/postgres
         self.engine = create_engine(conn_string)
         self.metadata.create_all(self.engine)
         self.connection = self.engine.connect()

@@ -21,6 +21,6 @@ class DataAccessLayer:
         )
         
     
-dal = DataAccessLayer("mongodb://localhost:27018", "root", "abc123")
+dal = DataAccessLayer("mongodb://mongo_raw:27018", "root", "abc123")
 
 

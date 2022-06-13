@@ -1,6 +1,7 @@
-from base import dal
 import time
 import datetime
+try: from base import dal
+except: from .base import dal
 
 def scrapper():
     pass

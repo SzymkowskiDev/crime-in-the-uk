@@ -10,9 +10,9 @@ services:
       PORT: 8000
     ports:
       - '8000:8000'
-    restart: "no"
+    restart: "always"
     depends_on:
-    - db
+    - postgres_final
     
   postgres_final:
     build: 
@@ -24,6 +24,7 @@ services:
     volumes:
       - sql-final-data:/var/lib/postgres/pgdata
     environment:
+      POSTGRES_USER: app_user
       POSTGRES_PASSWORD: abc123
 
   mongo_raw:
@@ -44,9 +45,9 @@ services:
       context: "./ingestor"
       dockerfile: "ingestor.dockerfile"
     container_name: ingestor_to_raw
-    restart: "no"
+    restart: "always"
     depends_on:
-    - raw
+    - mongo_raw
 
   spark:
     build:
@@ -55,7 +56,7 @@ services:
     container_name: spark
     restart: "no"
     depends_on:
-    - raw
+    - mongo_raw
 volumes:
   sql-final-data:
   mongo-raw-data:
