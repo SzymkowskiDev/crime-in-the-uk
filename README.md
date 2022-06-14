@@ -1,6 +1,8 @@
 
 # Crime in the UK (data project)
 
+![crime-stoppers](https://github.com/SzymkowskiDev/crime-in-the-uk/blob/master/crime_stoppers.gif)
+
 The project is focused on processing crime in the UK.
 The idea is to take data from https://crimestoppers-uk.org/ which is UK charity website, focused on
 providing information about crimes, and rewards for providing informations about perpetrators of crimes.
