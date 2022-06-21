@@ -8,19 +8,17 @@ class DataAccessLayer:
     password = None
     connection = None
 
-    def __init__(self, host, username, password):
+    def __init__(self, host):        
         self.host = host,
-        self.username = username
-        self.password = password
 
     def mongo_init(self):
         self.connection = pymongo.MongoClient(
             host = self.host,
-            username = self.username,
-            password = self.password
+            # username = self.username,
+            # password = self.password
         )
         
     
-dal = DataAccessLayer("mongodb://mongo_raw:27018", "root", "abc123")
-
+# dal = DataAccessLayer("mongodb://root:abc123@mongo_raw")
+dal = DataAccessLayer("mongodb://root:abc123@mongo_raw")
 
