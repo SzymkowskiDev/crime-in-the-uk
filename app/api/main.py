@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from sqlalchemy import select
+try: from .base import dal
+except: pass
 try: from base import dal
-except: from .base import dal
+except: pass
 
 app = FastAPI()
 
