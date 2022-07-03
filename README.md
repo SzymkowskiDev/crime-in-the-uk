@@ -29,6 +29,9 @@ spark - responsible for processing raw data to find insights about articles, for
 <br />  • what was the location of event?
 
 
+## 🚀 How to run
+Description.
+
 ## 📋 Requirements
 Docker Desktop
 Power BI Desktop for dashboard
@@ -128,9 +131,6 @@ Solution to error 2.
 
 
 ``` SOLUTION CODE ```
-
-## 🚀 Upgrading
-Description.
 
 ## 📖 Documentation
 Link to the wiki or external site.
