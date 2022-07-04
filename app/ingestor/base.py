@@ -19,6 +19,6 @@ class DataAccessLayer:
         )
         
     
-# dal = DataAccessLayer("mongodb://root:abc123@mongo_raw")
+# dal = pymongo.MongoClient(host ='127.0.0.1:27018', username = 'root' ,password = 'abc123' )
 dal = DataAccessLayer("mongodb://root:abc123@mongo_raw")
 
