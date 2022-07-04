@@ -32,13 +32,15 @@ services:
       context: "./mongo_raw"
       dockerfile: "mongo_raw.dockerfile"
     container_name: mongo_raw
+    # net:
     ports:
       - 27018:27017
-    volumes:
-      - mongo-raw-data:/data/db
+      # bindIp : [127.0.0.1,0.0.0.0]
+    # volumes:
+    #   - mongo-raw-data:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: abc123
+      MONGO_INITDB_ROOT_PASSWORD: abc123 
 
   ingestor:
     build:
@@ -59,5 +61,5 @@ services:
     - mongo_raw
 volumes:
   sql-final-data:
-  mongo-raw-data:
+  # mongo-raw-data:
 
