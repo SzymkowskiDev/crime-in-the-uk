@@ -30,7 +30,11 @@ spark - responsible for processing raw data to find insights about articles, for
 
 
 ## 🚀 How to run
-Description.
+Open the CMD at the app folder and run the following command:
+```python
+docker compose up -d --build
+```
+
 
 ## 📋 Requirements
 Docker Desktop
