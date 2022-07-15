@@ -7,6 +7,7 @@ except: pass
 try: from base import dal
 except: pass
 
+
 base_page = 'https://crimestoppers-uk.org'
 # testing with page 2
 base_search_page = 'https://crimestoppers-uk.org/campaigns-media/news?page=2'
@@ -75,20 +76,9 @@ def content_scenarios(data):
             return content
 
 def get_detailed_info(data):
-    datax = data
-    for i in datax:
-        # print(i)
-        
+    for i in data:
         inner_content = get_content_loop(get_base_search_page_content,i)
         subtitle = inner_content.find('h2')[0].text.strip()
-        # Comment = ''.join([x.text.replace('“','').replace('”','').replace('\n\n',' ')
-        #     for x in inner_content \
-        #     .xpath('//*[@id="main"]/main/article/div[2]/div/div/div/div/blockquote/span')])
-            
-        # partContent = inner_content.xpath('//*[@id="main"]/main/article/div[2]/div/div/div/div/span')
-
-        # limit = getContentLimit(partContent) +1
-        # content = ''.join([x.text for x in partContent[:limit]])
         try:
             content = content_scenarios(inner_content)
         except:
@@ -97,31 +87,9 @@ def get_detailed_info(data):
         if content == None: content = ''
         if subtitle != '':
             ''.join([subtitle,content])
-        # try:
-        #     commentAuthor = inner_content \
-        #         .xpath('//*[@id="main"]/main/article/div[2]/div/div/div/div/blockquote/footer/span')[0].text
-        # except IndexError as index:
-        #     commentAuthor = inner_content \
-        #         .xpath('//*[@id="main"]/main/article/div[2]/div/div/div/div/blockquote/footer/span/text()')
-        #     if commentAuthor == None:
-        #         commentAuthor = inner_content \
-        #         .xpath('//*[@id="main"]/main/article/div[2]/div/div/div/div/blockquote/footer/b/span/b/span/text()')
-        # try:
-        #     authorTitle = inner_content \
-        #         .xpath('//*[@id="main"]/main/article/div[2]/div/div/div/div/blockquote/footer/cite')[0].text
-        # except IndexError as index:
-        #      authorTitle = inner_content \
-        #         .xpath('//*[@id="main"]/main/article/div[2]/div/div/div/div/blockquote/footer/cite/text()')
-        
-        # datax[i]['subtitle'] = subtitle
-        # datax[i]['Comment'] = Comment
-        datax[i]['content'] = content
-        # datax[i]['comment author'] = commentAuthor
-        # datax[i]['author title'] = authorTitle
-    if datax:    
-        return datax
-    else:
-        return
+        data[i]['content'] = content
+    return data
+
 
 
 class Mongo_obj:
@@ -134,35 +102,29 @@ class Mongo_obj:
 
     def add_content(self):
         filtered_data = self.check_For_Articles(self.client, self.data)
-        self.insert_articles(self.client, filtered_data)
+        if filtered_data:
+            self.insert_articles(self.client, filtered_data)
 
     def check_For_Articles(self, myClient, content):
-        final = []
+        
         db = myClient["web_content"]
         col = db["articles"]
-        # col_content = [] 
-        # for x in col.find({},{'_id':0,'title':1}):
-        #     col_content.append([x['link']])
-        return content
-        # if len(a) == 0:
-        #     return content
-        # else:   
-        #     col_content = [x['link'] for x in col.find({},{'link':1,'_id':0})]
-        #     for i in content:        
-        #             if i['link'] not in col_content:
-        #                 final.append(i)
-        #     return final
+        final = []
         
+        # col_content = [x['link'] for x in col.find({},{'_id':0,'link':1})]
+        # test_col = [x for x in data]
+        col_content = [x['link'] for x in col.find({},{'_id':0,'link':1})]
+        for article in content:
+            if article[1]['link'] not in col_content and article[1]['content'] != '' :
+                final.append(article)
+        return final
 
     def insert_articles(self, myClient, content):
         db = myClient["web_content"]
         col = db["articles"]
         for i in content:
-            if i[1]['content'] != '':
                 col.insert_one(i[1])
 
-def findMostRecentArticle(content):
-    pass
 
 def get_last_page(content):
     # xpath = '//*[@id="main"]/main/article/div[1]/div/div[3]/div/nav/ul/li[15]/a'
@@ -201,9 +163,6 @@ if __name__ == '__main__':
         dal.mongo_init()
 
     myClient = dal.connection
-
-    # while True:
-    #     time.sleep(10)
         
     print(main(myClient))
 
