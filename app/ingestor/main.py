@@ -17,6 +17,8 @@ class Web_content:
 
 
 def get_content_loop(func,url):
+    # act as decorator, if func return False will loop over till
+    # content is available is used in scrapping functions to reach contant
     content = func(url)
     while content == False:
         time.sleep(5)
@@ -27,7 +29,8 @@ def get_content_loop(func,url):
 
 
 def get_base_search_page_content(url):
-    # Taking url and checking if we're marked as bot, if yes, then will return False, else url html of url
+    # Taking url and checking if we're marked as bot,
+    # if yes, then will return False, else url html of url
     session = HTMLSession()
     url = session.get(url).html
     check =  url.xpath('/html/head/meta/@name')
@@ -35,12 +38,14 @@ def get_base_search_page_content(url):
         return False
     return url
 
-def getContentLimit(data):    
+def getContentLimit(data):
+    # used to reach part of article where we find uninteresting data     
     for k,l in enumerate(data):
         if "***" in l.text:
             return k
 
 def get_base_info(url_html):
+    # loops over to find title, link, post date of article, returns dict which serve as collection to be extended when reaching for details
     arts_info = {}
     arts = url_html.xpath('//*[@id="main"]/main/article/div[1]/div/div[2]')
     test = re.compile('\: ')
@@ -55,7 +60,8 @@ def get_base_info(url_html):
                     arts_info[link] = {'title': title, 'post date': date, 'link': link}
     return arts_info
 
-def content_scenarios(data):    
+def content_scenarios(data):
+    # adds content of article to dict returned by get_base_info
     reward_line1 = getContentLimit(
             data.xpath('//*[@id="main"]/main/article/div[2]/div/div/div/div/span'))
     if isinstance(reward_line1,int):
@@ -124,7 +130,7 @@ def get_detailed_info(data):
         return
 
 
-class Mongo_obj:
+class Mongo_obj:     
     
     def __init__(self, client):
         self.client = client
