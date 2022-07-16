@@ -51,14 +51,16 @@ services:
     depends_on:
     - mongo_raw
 
-  spark:
+  data_proc:
     build:
-      context: "./spark"
-      dockerfile: "spark.dockerfile"
-    container_name: spark
+      context: "./data_proc"
+      dockerfile: "data_proc.dockerfile"
+    container_name: data_proc
     restart: "no"
     depends_on:
     - mongo_raw
+    - postgres_final
+    
 volumes:
   sql-final-data:
   # mongo-raw-data:
