@@ -13,7 +13,7 @@ class PostgresDataAccessLayer:
     engine = None
     conn_string = None
     metadata = MetaData()
-    events = Table('articles', metadata,
+    articles = Table('articles', metadata,
         Column('article_id', Integer(), primary_key=True, autoincrement=True),
         Column('mongo_id', String(), primary_key=True),
         Column('title',String(60),nullable=False),
