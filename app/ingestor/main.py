@@ -2,103 +2,140 @@ import time
 import datetime
 from requests_html import HTMLSession, HTML
 import re
+from bs4 import BeautifulSoup
 try: from .base import dal
 except: pass
 try: from base import dal
 except: pass
 
 
-base_page = 'https://crimestoppers-uk.org'
-# testing with page 2
-base_search_page = 'https://crimestoppers-uk.org/campaigns-media/news?page=2'
+class ArticlesContent:
+    BASE_PAGE = 'https://crimestoppers-uk.org'
+    BASE_SEARCH_PAGE = 'https://crimestoppers-uk.org/campaigns-media/news?page=2'
 
-class Web_content:
-    pass
+    def __init__(self,mongo_client):
+        self.mongo_client = mongo_client
 
+    def main(self):
+            # implement limit with envNs
+        last_page = self.get_last_page(
+                        self.get_content_loop(
+                            self.check_bot_mark_return_content,'https://crimestoppers-uk.org/campaigns-media/news?page=2')
+                        )
+        
+        mongo = MongoForArticles(self.mongo_client)
 
+        for page in range(2,last_page+1):
+            result = []        
+            # base_html = get_base_search_page_content(base_search_page)
+            start_page = f'https://crimestoppers-uk.org/campaigns-media/news?page={page}'
+            base_html = self.get_content_loop(self.check_bot_mark_return_content,start_page)
+            base_data = self.get_base_info(base_html)
+            details_data = self.get_detailed_content(base_data)
+            # return details_data
+            if details_data:
+                for article in details_data.items():
+                    result.append(article)
+            
+            mongo.set_data(result)
+            mongo.add_content()
+            time.sleep(5)
 
-def get_content_loop(func,url):
+    def get_content_loop(self,func,url):
     # act as decorator, if func return False will loop over till
     # content is available is used in scrapping functions to reach contant
-    content = func(url)
-    while content == False:
-        time.sleep(5)
-        del content
         content = func(url)
-    return content
-
-
-
-def get_base_search_page_content(url):
-    # Taking url and checking if we're marked as bot,
-    # if yes, then will return False, else url html of url
-    session = HTMLSession()
-    url = session.get(url).html
-    check =  url.xpath('/html/head/meta/@name')
-    if check[0] == 'ROBOTS':
-        return False
-    return url
-
-def getContentLimit(data):
-    # used to reach part of article where we find uninteresting data     
-    for k,l in enumerate(data):
-        if "***" in l.text:
-            return k
-
-def get_base_info(url_html):
-    # loops over to find title, link, post date of article, returns dict which serve as collection to be extended when reaching for details
-    arts_info = {}
-    arts = url_html.xpath('//*[@id="main"]/main/article/div[1]/div/div[2]')
-    test = re.compile('\: ')
-    for i in range(1,len(arts[0].find('div.article-title'))+1):
-            try:
-                title = url_html.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[2]/div[{i}]/article/a/div/strong')[0].text
-            except: IndexError
-            else:     
-                if test.findall(title):
-                    link = 'https://crimestoppers-uk.org' + url_html.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[2]/div[{i}]/article/a/@href')[0]
-                    date = url_html.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[2]/div[{i}]/article/a/div/time/text()')[0]
-                    arts_info[link] = {'title': title, 'post date': date, 'link': link}
-    return arts_info
-
-def content_scenarios(data):
-    # adds content of article to dict returned by get_base_info
-    reward_line1 = getContentLimit(
-            data.xpath('//*[@id="main"]/main/article/div[2]/div/div/div/div/span'))
-    if isinstance(reward_line1,int):
-        partContent = data.xpath('//*[@id="main"]/main/article/div[2]/div/div/div/div/span')
-        content = ''.join([x.text for x in partContent[:reward_line1+1]])
+        while content == False:
+            time.sleep(5)
+            del content
+            content = func(url)
         return content
-    if isinstance(reward_line1,int) == False:
-        reward_line2 = data.xpath('//*[@id="main"]/main/article/div[2]/div/div/div/div/p[2]/strong[1]')
-        if '***' in reward_line2:
-            partContent = data.xpath('//*[@id="main"]/main/article/div[2]/div/div/div/div/p[1]/text()')
-            content = ''.join(reward_line2,[x for x in partContent if x != ''])
-            return content
-        if len(reward_line2) == 0:
-            partContent = data.xpath('//*[@id="main"]/main/article/div[2]/div/div/div/div/p[1]/text()')
-            strong = data.xpath('//*[@id="main"]/main/article/div[2]/div/div/div/div/p[1]/strong/text()')
-            content = ''.join([*strong,*[x for x in partContent if x != '']])
-            return content
-
-def get_detailed_info(data):
-    for i in data:
-        inner_content = get_content_loop(get_base_search_page_content,i)
-        subtitle = inner_content.find('h2')[0].text.strip()
-        try:
-            content = content_scenarios(inner_content)
-        except:
-            content = ''
-            pass
-        if content == None: content = ''
-        if subtitle != '':
-            ''.join([subtitle,content])
-        data[i]['content'] = content
-    return data
 
 
+    def check_bot_mark_return_content(self,url):
+        # Taking url and checking if we're marked as bot,
+        # if yes, then will return False, else url html of url
+        session = HTMLSession()
+        content = session.get(url).html
+        check =  content.xpath('/html/head/meta/@name')
+        if check[0] == 'ROBOTS':
+            return False
+        return content
 
-class Mongo_obj:     
+
+    def get_detailed_content(self,articles):
+        for article in articles:
+            inner_content = self.get_content_loop(self.check_bot_mark_return_content,article)
+            subtitle = inner_content.find('h2')[0].text.strip()
+            try:
+                body = self.get_article_body(inner_content)
+            except:
+                body = ''
+                pass
+            if body == None: body = ''
+            if subtitle != '':
+                body = ''.join([subtitle,body])
+            articles[article]['content'] = body
+        return articles
+
+
+    def get_base_info(self,content):
+        # loops over to find title, link, post date of article,
+        # returns dict which serve as collection to be extended when reaching for details
+        content_with_base_data = {}
+        arts = content.xpath('//*[@id="main"]/main/article/div[1]/div/div[2]')
+        test = re.compile('\: ')
+        # articles which are interesting for us usually have ":" within name
+        for i in range(1,len(arts[0].find('div.article-title'))+1):
+                try:
+                    title = content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[2]/div[{i}]/article/a/div/strong')[0].text
+                except: IndexError
+                else:     
+                    if test.findall(title):
+                        link = self.BASE_PAGE + content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[2]/div[{i}]/article/a/@href')[0]
+                        date = content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[2]/div[{i}]/article/a/div/time/text()')[0]
+                        content_with_base_data[link] = {'title': title, 'post date': date, 'link': link}
+        return content_with_base_data
+
+
+    def get_article_body(self,content):
+        article_body = []
+        # adds body of article to dict returned by get_base_info
+        def test_for_common(paragraph):
+            # check if paragraph is one of common paragraph added to most of articles 
+            commons = [
+                'Please note: Computer IP addresses are never traced, and no-one',
+                '***Information passed directly to police will not qualify for a reward',
+                'To give information 100% anonymously and',
+                '***Note: Information passed directly to police will not qualify. The reward'
+                    ]
+            test = False
+            for common in commons:
+                if common in paragraph:
+                    test = True
+                    return test
+            return test
+
+        body_box = content.xpath('//*[@id="main"]/main//div[2]/div/div/div/div')[0]
+        soup = BeautifulSoup(body_box, 'html.parser')
+        for elem in soup.find_all((True, {'class':['span', 'strong','p']})):
+            striped_elem = elem.text.strip()
+            if True == test_for_common(striped_elem):
+                continue
+            else:
+                article_body.append(striped_elem)
+
+        article_body = set(article_body)
+        article_body = ''.join([x for x in article_body if x != ''])
+        return article_body
+
+    def get_last_page(self,content):
+        data = content.xpath('//*[@id="main"]/main/article/div[1]/div/div[3]/div/nav/ul/li[15]/a/@href')
+        splitted_data = int(data[0].split('/')[-1].split('=')[-1])
+        return splitted_data
+
+
+class MongoForArticles:     
     
     def __init__(self, client):
         self.client = client
@@ -112,13 +149,12 @@ class Mongo_obj:
             self.insert_articles(self.client, filtered_data)
 
     def check_For_Articles(self, myClient, content):
-        
+        # check with link if article was already processed if no then will add it to mongo
+
         db = myClient["web_content"]
         col = db["articles"]
         final = []
         
-        # col_content = [x['link'] for x in col.find({},{'_id':0,'link':1})]
-        # test_col = [x for x in data]
         col_content = [x['link'] for x in col.find({},{'_id':0,'link':1})]
         for article in content:
             if article[1]['link'] not in col_content and article[1]['content'] != '' :
@@ -131,44 +167,13 @@ class Mongo_obj:
         for i in content:
                 col.insert_one(i[1])
 
-
-def get_last_page(content):
-    # xpath = '//*[@id="main"]/main/article/div[1]/div/div[3]/div/nav/ul/li[15]/a'
-    data = content.xpath('//*[@id="main"]/main/article/div[1]/div/div[3]/div/nav/ul/li[15]/a/@href')
-    splitted_data = int(data[0].split('/')[-1].split('=')[-1])
-    return splitted_data
-
-def main(myClient):
-
-    # implement limit with envNs
-    last_page = get_last_page(
-                get_content_loop(
-                    get_base_search_page_content,'https://crimestoppers-uk.org/campaigns-media/news?page=2'))
-    
-    mongo = Mongo_obj(myClient)
-
-    for page in range(2,last_page):
-        res = []        
-        # base_html = get_base_search_page_content(base_search_page)
-        start_page = f'https://crimestoppers-uk.org/campaigns-media/news?page={page}'
-        base_html = get_content_loop(get_base_search_page_content,start_page)
-        base_data = get_base_info(base_html)
-        details_data = get_detailed_info(base_data)
-        # return details_data
-        if details_data:
-            for article in details_data.items():
-                res.append(article)
-        
-        mongo.set_data(res)
-        mongo.add_content()
-        time.sleep(5)
-    
-
 if __name__ == '__main__':
     if dal.connection == None:
         dal.mongo_init()
 
-    myClient = dal.connection
-        
-    print(main(myClient))
+    my_client = dal.connection
+    
+    article_processor = ArticlesContent(my_client)
+    article_processor.main()
+
 

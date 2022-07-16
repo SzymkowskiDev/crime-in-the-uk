@@ -14,8 +14,6 @@ class DataAccessLayer:
     def mongo_init(self):
         self.connection = pymongo.MongoClient(
             host = self.host,
-            # username = self.username,
-            # password = self.password
         )
           
         
