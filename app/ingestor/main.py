@@ -132,6 +132,10 @@ class ArticlesContent:
                             link = self.BASE_PAGE + content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[3]/div[{i}]/article/a/@href')[0]
                             date = content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[3]/div[{i}]/article/a/div/time/text()')[0]
                             content_with_base_data[link] = {'title': title, 'post date': date, 'link': link}
+        
+        # str to datetime transformation
+        for pos in content_with_base_data.items():
+            pos[1]['post date'] = datetime.datetime.strptime(pos[1]['post date'],"%d/%m/%Y")
 
         return content_with_base_data
 
