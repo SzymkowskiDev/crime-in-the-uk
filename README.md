@@ -8,7 +8,7 @@ The idea is to take data from https://crimestoppers-uk.org/ which is UK charity 
 providing information about crimes, and rewards for providing informations about perpetrators of crimes.
 
 The project's purpose is to harvest information from the website, store its content in MongoDB, and then process it with
-Spark, in order to find context of each article using SparkML. The processed data is then added to Postgres, which serves as source for Power BI and API for data access and further analysis. 
+data_proc container, in order to find context of each article using NLP libraries. The processed data is then added to Postgres, which serves as source for Power BI and API for data access and further analysis. 
 
 ## Contents
 
@@ -23,7 +23,7 @@ mongo_raw - mongodb serving the project as raw storage of data
 
 postgres_final - postgres database which is used by Power BI and api to access the final data
 
-spark - responsible for processing raw data to find insights about articles, for example:
+data_proc - responsible for processing raw data to find insights about articles, for example:
 <br />  • what type of crime was commited?
 <br />  • what is the reward for providing information?
 <br />  • what was the location of event?
@@ -80,7 +80,7 @@ Sth
     │   ├───mongo_raw
     │   ├───postgres_final
     │   ├───powerbi
-    │   └───spark
+    │   └───data_proc
     └───documentation
         └───diagrams
 

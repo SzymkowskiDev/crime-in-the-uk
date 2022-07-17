@@ -21,8 +21,8 @@ services:
     container_name: postgres_final
     ports:
       - '5432:5432'
-    volumes:
-      - sql-final-data:/var/lib/postgres/pgdata
+    # volumes:
+    #   - sql-final-data:/var/lib/postgres/pgdata
     environment:
       POSTGRES_USER: app_user
       POSTGRES_PASSWORD: abc123
@@ -61,7 +61,7 @@ services:
     - mongo_raw
     - postgres_final
     
-volumes:
-  sql-final-data:
+# volumes:
+#   sql-final-data:
   # mongo-raw-data:
 
