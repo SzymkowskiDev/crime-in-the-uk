@@ -2,7 +2,6 @@ import time
 import datetime
 from requests_html import HTMLSession, HTML
 import re
-from bs4 import BeautifulSoup
 try: from .base import dal
 except: pass
 try: from base import dal
@@ -11,7 +10,7 @@ except: pass
 
 class ArticlesContent:
     BASE_PAGE = 'https://crimestoppers-uk.org'
-    BASE_SEARCH_PAGE = 'https://crimestoppers-uk.org/campaigns-media/news?page=2'
+    BASE_SEARCH_PAGE = 'https://crimestoppers-uk.org/campaigns-media/news?page=1'
 
     def __init__(self,mongo_client):
         self.mongo_client = mongo_client
@@ -25,12 +24,12 @@ class ArticlesContent:
         
         mongo = MongoForArticles(self.mongo_client)
 
-        for page in range(2,last_page+1):
+        for page in range(1,last_page+1):
             result = []        
             # base_html = get_base_search_page_content(base_search_page)
             start_page = f'https://crimestoppers-uk.org/campaigns-media/news?page={page}'
             base_html = self.get_content_loop(self.check_bot_mark_return_content,start_page)
-            base_data = self.get_base_info(base_html)
+            base_data = self.get_base_info(base_html,page)
             details_data = self.get_detailed_content(base_data)
             # return details_data
             if details_data:
@@ -79,22 +78,61 @@ class ArticlesContent:
         return articles
 
 
-    def get_base_info(self,content):
+    def get_base_info(self,content,page):
         # loops over to find title, link, post date of article,
         # returns dict which serve as collection to be extended when reaching for details
         content_with_base_data = {}
-        arts = content.xpath('//*[@id="main"]/main/article/div[1]/div/div[2]')
-        test = re.compile('\: ')
+        
         # articles which are interesting for us usually have ":" within name
-        for i in range(1,len(arts[0].find('div.article-title'))+1):
-                try:
-                    title = content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[2]/div[{i}]/article/a/div/strong')[0].text
-                except: IndexError
-                else:     
-                    if test.findall(title):
-                        link = self.BASE_PAGE + content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[2]/div[{i}]/article/a/@href')[0]
-                        date = content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[2]/div[{i}]/article/a/div/time/text()')[0]
-                        content_with_base_data[link] = {'title': title, 'post date': date, 'link': link}
+        test = re.compile('\: ')
+        
+        if page != 1:
+            arts = content.xpath('//*[@id="main"]/main/article/div[1]/div/div[2]')
+
+            for i in range(1,len(arts[0].find('div.article-title'))+1):
+                    try:
+                        title = content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[2]/div[{i}]/article/a/div/strong')[0].text
+                    except: IndexError
+                    else:     
+                        if test.findall(title):
+                            link = self.BASE_PAGE + content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[2]/div[{i}]/article/a/@href')[0]
+                            date = content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[2]/div[{i}]/article/a/div/time/text()')[0]
+                            content_with_base_data[link] = {'title': title, 'post date': date, 'link': link}
+        elif page == 1:            
+
+            try:
+                lead_title = content.xpath('//*[@id="main"]/main/article/div[1]/div/div[2]/div[1]/article/a/div/strong')[0].text
+            except: IndexError
+            else:     
+                if test.findall(lead_title):
+                    lead_link = self.BASE_PAGE + content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[2]/div[1]/article/a/@href')
+                    lead_date = content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[2]/div[1]/article/a/div/time/text()')
+                    content_with_base_data[link] = {'title': lead_title, 'post date': lead_date, 'link': lead_link}
+
+            first_half_articles = content.xpath('//*[@id="main"]/main/article/div[1]/div/div[2]')
+
+            for i in range(1,len(first_half_articles[0].find('div.article-title'))):
+                    try:
+                        title = content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[2]/div[2]/div/div[{i}]/article/a/div/strong')[0].text
+                    except: IndexError
+                    else:     
+                        if test.findall(title):
+                            link = self.BASE_PAGE + content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[2]/div[2]/div/div[{i}]/article/a/@href')[0]
+                            date = content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[2]/div[{i}]/article/a/div/time/text()')[0]
+                            content_with_base_data[link] = {'title': title, 'post date': date, 'link': link}
+
+            second_half_articles = content.xpath('//*[@id="main"]/main/article/div[1]/div/div[3]')
+
+            for i in range(1,len(second_half_articles[0].find('div.article-title'))+1):
+                    try:
+                        title = content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[3]/div[{i}]/article/a/div/strong')[0].text
+                    except: IndexError
+                    else:     
+                        if test.findall(title):
+                            link = self.BASE_PAGE + content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[3]/div[{i}]/article/a/@href')[0]
+                            date = content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[3]/div[{i}]/article/a/div/time/text()')[0]
+                            content_with_base_data[link] = {'title': title, 'post date': date, 'link': link}
+
         return content_with_base_data
 
 
@@ -107,7 +145,8 @@ class ArticlesContent:
                 'Please note: Computer IP addresses are never traced, and no-one',
                 '***Information passed directly to police will not qualify for a reward',
                 'To give information 100% anonymously and',
-                '***Note: Information passed directly to police will not qualify. The reward'
+                '***Note: Information passed directly to police will not qualify. The reward',
+                'If you have information, please fill in our simple and secure '
                     ]
             test = False
             for common in commons:
@@ -116,14 +155,13 @@ class ArticlesContent:
                     return test
             return test
 
-        body_box = content.xpath('//*[@id="main"]/main//div[2]/div/div/div/div')[0]
-        soup = BeautifulSoup(body_box, 'html.parser')
-        for elem in soup.find_all((True, {'class':['span', 'strong','p']})):
-            striped_elem = elem.text.strip()
-            if True == test_for_common(striped_elem):
+        body_box = content.xpath('//*[@id="main"]/main//div[2]/div/div/div/div')[0].text
+        body_box_split = [x.strip() for x in body_box.split('\n') if x != '']
+        for elem in body_box_split:
+            if True == test_for_common(elem):
                 continue
             else:
-                article_body.append(striped_elem)
+                article_body.append(elem)
 
         article_body = set(article_body)
         article_body = ''.join([x for x in article_body if x != ''])
