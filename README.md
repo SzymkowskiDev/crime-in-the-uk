@@ -1,14 +1,21 @@
 
 # Crime in the UK (data project)
 
-![crime-stoppers](https://github.com/SzymkowskiDev/crime-in-the-uk/blob/master/crime_stoppers.gif)
+Crime Stoppers (crimestoppers-uk.org) is a website that publishes articles on wanted criminals for various offences commited in the UK. Our project harvests this text data and implements Natural Language Processing on it to extract information such as: offender's name, crimes commited, narcotics involved, location, among others. Finally, analtics is performed on the data obtained.
 
-The project is focused on processing crime in the UK.
-The idea is to take data from https://crimestoppers-uk.org/ which is UK charity website, focused on
-providing information about crimes, and rewards for providing informations about perpetrators of crimes.
+# Technology stack
+* Docker
+* MongoDB
+* Postgres
+* Python
+** 
 
-The project's purpose is to harvest information from the website, store its content in MongoDB, and then process it with
-data_proc container, in order to find context of each article using NLP libraries. The processed data is then added to Postgres, which serves as source for Power BI and API for data access and further analysis. 
+## 🚀 How to run
+Open the CMD at the app folder and run the following command:
+```python
+docker compose up -d --build
+```
+
 
 ## Contents
 
@@ -29,11 +36,7 @@ data_proc - responsible for processing raw data to find insights about articles,
 <br />  • what was the location of event?
 
 
-## 🚀 How to run
-Open the CMD at the app folder and run the following command:
-```python
-docker compose up -d --build
-```
+
 
 
 ## 📋 Requirements
