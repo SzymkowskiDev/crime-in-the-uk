@@ -17,7 +17,7 @@ Crime Stoppers (crimestoppers-uk.org) is a website that publishes articles on wa
 ## 🚀 How to run
 1. Clone the repository to the desired folder
 2. Open Docker Desktop and make sure that the downloaded containers appear correctly
-3. Open the CMD at the app folder and run the following command:
+3. Open the CMD at the app folder and are run the following command:
 ```cmd
 docker compose up -d --build
 ```
