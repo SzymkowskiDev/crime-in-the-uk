@@ -74,14 +74,17 @@ Overview of technology domains employed in the project:
 
 - [ ] More ambitious NLP analysis
 - [ ] Better web scraping
-      * [ ] More representative sample (more articles harvested and of various type)
-      * [ ] Scraping other websites
-      * [ ] Scraping images
+      - [ ] More representative sample (more articles harvested and of various type)
+      - [ ] Scraping other websites
+      - [ ] Scraping images
 - [ ] MongoDB improvements (better connection)
 - [ ] Computer Vision 
-- [ ] 
-- [ ] 
-- [ ] 
+- [ ] Dashboard (web app with data viz)
+- [ ] Dashboard deployment
+- [ ] CI/CD
+- [ ] API Development
+      - [ ] Basic API requests
+      - [ ] More advanced API requests
 - [ ] 
 
 ## 📂 Directory Structure
