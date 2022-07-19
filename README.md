@@ -74,7 +74,7 @@ Overview of technology domains employed in the project:
 
 - [ ] More ambitious NLP analysis
 - [ ] Better web scraping
-- ⬜⬜⬜ [ ] More representative sample (more articles harvested and of various type)
+    - [ ] More representative sample (more articles harvested and of various type)
 - ⬜⬜⬜ [ ] Scraping other websites
 - ⬜⬜⬜ [ ] Scraping images
 - [ ] MongoDB improvements (better connection)
