@@ -7,11 +7,8 @@ Crime Stoppers (crimestoppers-uk.org) is a website that publishes articles on wa
 * [SzymkowskiDev](https://github.com/SzymkowskiDev)
 * [Dawido090](https://github.com/Dawido090)
 
-![diagram](https://github.com/SzymkowskiDev/crime-in-the-uk/blob/master/documentation/diagrams/Project%20Diagram.png?raw=true)
-
 <p align="center">
-  <img src="documentation/diagrams/Project%20Diagram.png" width="350" title="hover text">
-  <img src="documentation/diagrams/Project%20Diagram.png" width="350" alt="accessibility text">
+  <img src="documentation/diagrams/Project%20Diagram.png" width="550" title="hover text">
 </p>
 
 # 🤖 Technology stack
