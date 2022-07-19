@@ -68,13 +68,21 @@ Overview of technology domains employed in the project:
 
 - [X] Doker orchestration and databases setup
 - [X] Web scrapper
-- [X] NLP infromation extraction
-- [ ] Dashboard
+- [X] NLP infromation extraction (first iterations)
 
 **Version 2.0.0**
 
-- [ ] Computer Vision
-
+- [ ] More ambitious NLP analysis
+- [ ] Better web scraping
+      * [ ] More representative sample (more articles harvested and of various type)
+      * [ ] Scraping other websites
+      * [ ] Scraping images
+- [ ] MongoDB improvements (better connection)
+- [ ] Computer Vision 
+- [ ] 
+- [ ] 
+- [ ] 
+- [ ] 
 
 ## 📂 Directory Structure
 
