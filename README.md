@@ -8,7 +8,7 @@ Crime Stoppers (crimestoppers-uk.org) is a website that publishes articles on wa
 * [Dawido090](https://github.com/Dawido090)
 
 <p align="center">
-  <img src="documentation/diagrams/Project%20Diagram.png" width="550" title="hover text">
+  <img src="documentation/diagrams/Project%20Diagram.png" width="800" title="hover text">
 </p>
 
 # 🤖 Technology stack
