@@ -7,7 +7,7 @@ Crime Stoppers (crimestoppers-uk.org) is a website that publishes articles on wa
 * [SzymkowskiDev](https://github.com/SzymkowskiDev)
 * [Dawido090](https://github.com/Dawido090)
 
-[diagram](https://github.com/SzymkowskiDev/crime-in-the-uk/blob/master/documentation/diagrams/Project%20Diagram.png?raw=true)
+![diagram](https://github.com/SzymkowskiDev/crime-in-the-uk/blob/master/documentation/diagrams/Project%20Diagram.png?raw=true)
 
 # 🤖 Technology stack
 * Docker
