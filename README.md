@@ -3,6 +3,10 @@
 
 Crime Stoppers (crimestoppers-uk.org) is a website that publishes articles on wanted criminals for various offences commited in the UK. Our project harvests this text data and implements Natural Language Processing on it to extract information such as: offender's name, crimes commited, narcotics involved, location, among others. Finally, analtics is performed on the data obtained.
 
+## 👨‍💻 Contributing
+* [SzymkowskiDev](https://github.com/SzymkowskiDev)
+* [Dawido090](https://github.com/Dawido090)
+
 # 🤖 Technology stack
 * Docker
 * MongoDB
@@ -53,6 +57,19 @@ Overview of technology domains employed in the project:
 ⭐ **Data Visualisation with PowerBI and Dash**
 
 ⭐ **Web scraping**
+
+## 📅 Development Schedule
+**Version 1.0.0**
+
+- [X] Doker orchestration and databases setup
+- [X] Web scrapper
+- [X] NLP infromation extraction
+- [ ] Dashboard
+
+**Version 2.0.0**
+
+- [ ] Computer Vision
+
 
 ## 📂 Directory Structure
 
