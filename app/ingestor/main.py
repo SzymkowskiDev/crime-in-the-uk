@@ -22,7 +22,7 @@ class ArticlesContent:
                             self.check_bot_mark_return_content,'https://crimestoppers-uk.org/campaigns-media/news?page=2')
                         )
         
-        mongo = MongoForArticles(self.mongo_client)
+        mongo = MongoDataProc(self.mongo_client)
 
         for page in range(1,last_page+1):
             result = []        
@@ -37,7 +37,7 @@ class ArticlesContent:
                     result.append(article)
             
             mongo.set_data(result)
-            mongo.add_content()
+            mongo.add_articles()
             time.sleep(5)
 
     def get_content_loop(self,func,url):
@@ -177,20 +177,49 @@ class ArticlesContent:
         return splitted_data
 
 
-class MongoForArticles:     
+class MongoDataProc:     
     
     def __init__(self, client):
         self.client = client
-        
+
+
     def set_data(self, data):
         self.data = data
 
-    def add_content(self):
-        filtered_data = self.check_For_Articles(self.client, self.data)
+
+    def add_most_wanted(self):
+        filtered_data = self.check_for_most_wanted(self.client, self.data)
+        if filtered_data:
+            self.insert_most_wanted(self.client, filtered_data)
+
+    def check_for_most_wanted(self, myClient, content):
+        # check with link if most wanted was already processed if no then will add it to mongo
+
+        db = myClient["web_content"]
+        col = db["most_wanted"]
+        final = []
+        
+        col_content = [x['link'] for x in col.find({},{'_id':0,'link':1})]
+        for article in content:
+            if article[1]['link'] not in col_content and article[1]['content'] != '' :
+                final.append(article)
+        return final
+
+
+    def insert_most_wanted(self, myClient, content):
+        db = myClient["web_content"]
+        col = db["most_wanted"]
+        for i in content:
+                col.insert_one(i[1])
+
+
+    def add_articles(self):
+        filtered_data = self.check_for_articles(self.client, self.data)
         if filtered_data:
             self.insert_articles(self.client, filtered_data)
 
-    def check_For_Articles(self, myClient, content):
+
+    def check_for_articles(self, myClient, content):
         # check with link if article was already processed if no then will add it to mongo
 
         db = myClient["web_content"]
@@ -203,11 +232,13 @@ class MongoForArticles:
                 final.append(article)
         return final
 
+
     def insert_articles(self, myClient, content):
         db = myClient["web_content"]
         col = db["articles"]
         for i in content:
                 col.insert_one(i[1])
+
 
 if __name__ == '__main__':
     if dal.connection == None:
@@ -218,4 +249,4 @@ if __name__ == '__main__':
     article_processor = ArticlesContent(my_client)
     article_processor.main()
 
-
+# https://crimestoppers-uk.org/give-information/most-wanted
