@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from sqlalchemy import select
 from .base import dal
 
 
