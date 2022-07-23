@@ -17,8 +17,9 @@ class DataAccessLayer:
         Column('category',String(30),nullable=False)
         )
     def db_init(self):
-        conn_string = "postgresql+psycopg2://app_user:abc123@postgres_final:5432/postgres"
+        # conn_string = "postgresql+psycopg2://app_user:abc123@postgres_final:5432/postgres"
         # postgresql+psycopg2://root:abc123@postgres_final/postgres
+        conn_string = "postgresql://{}:{}@{}/{}".format("postgres","1234", "Localhost", "fastapi")
         self.engine = create_engine(conn_string)
         self.metadata.create_all(self.engine)
         self.connection = self.engine.connect()

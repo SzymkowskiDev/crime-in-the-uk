@@ -1,9 +1,6 @@
 from fastapi import FastAPI
-from sqlalchemy import select
-try: from .base import dal
-except: pass
-try: from base import dal
-except: pass
+from .base import dal
+
 
 app = FastAPI()
 
@@ -20,3 +17,4 @@ def hello_world():
 #     tables = [dal.events.c.table_catalog, dal.events.c.table_schema, dal.events.c.table_name]
 #     data = dal.connection.execute(select(tables)).fetchall()
 #     return {"data": [x for x in data]}
+ 
