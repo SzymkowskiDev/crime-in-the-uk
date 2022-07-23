@@ -298,10 +298,10 @@ class MostWantedContent:
         body_box = content.xpath('//*[@id="main"]/main/article/div[2]/div/div/div')[0].text
         body_box_split = [x.strip() for x in body_box.split('\n') if x != '']
         for elem in body_box_split:
-            # if True == test_for_common(elem):
-            #     continue
-            # else:
-            article_body.append(elem)
+            if True == test_for_common(elem):
+                continue
+            else:
+                article_body.append(elem)
 
         article_body = set(article_body)
         article_body = '\n'.join([x for x in article_body if x != ''])
