@@ -173,8 +173,7 @@ class ArticlesContent:
             else:
                 article_body.append(elem)
 
-        article_body = set(article_body)
-        article_body = ''.join([x for x in article_body if x != ''])
+        article_body = '\n'.join([x for x in article_body if x != ''])
         return article_body
 
 
@@ -303,7 +302,6 @@ class MostWantedContent:
             else:
                 article_body.append(elem)
 
-        article_body = set(article_body)
         article_body = '\n'.join([x for x in article_body if x != ''])
         return article_body
 
