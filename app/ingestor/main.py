@@ -16,10 +16,10 @@ class ArticlesContent:
         self.mongo_client = mongo_client
 
     def main(self):
-            # implement limit with envNs
+        # implement limit with envNs
         last_page = self.get_last_page(
                         self.get_content_loop(
-                            self.check_bot_mark_return_content,'https://crimestoppers-uk.org/campaigns-media/news?page=2')
+                            self.check_bot_mark_return_content,'https://crimestoppers-uk.org/campaigns-media/news?page=1')
                         )
         
         mongo = MongoDataProc(self.mongo_client)
@@ -60,6 +60,12 @@ class ArticlesContent:
         if check[0] == 'ROBOTS':
             return False
         return content
+
+
+    def get_last_page(self,content):
+        data = content.xpath('//*[@id="main"]/main/article/div[1]/div/div[3]/div/nav/ul/li[15]/a/@href')
+        splitted_data = int(data[0].split('/')[-1].split('=')[-1])
+        return splitted_data
 
 
     def get_detailed_content(self,articles):
@@ -171,10 +177,135 @@ class ArticlesContent:
         article_body = ''.join([x for x in article_body if x != ''])
         return article_body
 
+
+
+class MostWantedContent:
+    BASE_PAGE = 'https://crimestoppers-uk.org'
+    BASE_SEARCH_PAGE = 'https://crimestoppers-uk.org/give-information/most-wanted?page=1&'
+
+    def __init__(self,mongo_client):
+        self.mongo_client = mongo_client
+
+    def main(self):
+        # implement limit with envNs
+        last_page = self.get_last_page(
+                        self.get_content_loop(
+                            self.check_bot_mark_return_content,'https://crimestoppers-uk.org/give-information/most-wanted?page=1&')
+                        )
+        
+        mongo = MongoDataProc(self.mongo_client)
+
+        for page in range(1,last_page+1):
+            result = []        
+            # base_html = get_base_search_page_content(base_search_page)
+            start_page = f'https://crimestoppers-uk.org/give-information/most-wanted?page={page}&'
+            base_html = self.get_content_loop(self.check_bot_mark_return_content,start_page)
+            base_data = self.get_base_info(base_html)
+            details_data = self.get_detailed_content(base_data)
+            # return details_data
+            if details_data:
+                for article in details_data.items():
+                    result.append(article)
+            
+            mongo.set_data(result)
+            mongo.add_most_wanted()
+            time.sleep(5)
+
+    def get_content_loop(self,func,url):
+    # act as decorator, if func return False will loop over till
+    # content is available is used in scrapping functions to reach contant
+        content = func(url)
+        while content == False:
+            time.sleep(5)
+            del content
+            content = func(url)
+        return content
+
+
+    def check_bot_mark_return_content(self,url):
+        # Taking url and checking if we're marked as bot,
+        # if yes, then will return False, else url html of url
+        session = HTMLSession()
+        content = session.get(url).html
+        check =  content.xpath('/html/head/meta/@name')
+        if check[0] == 'ROBOTS':
+            return False
+        return content
+
+
     def get_last_page(self,content):
-        data = content.xpath('//*[@id="main"]/main/article/div[1]/div/div[3]/div/nav/ul/li[15]/a/@href')
-        splitted_data = int(data[0].split('/')[-1].split('=')[-1])
+        data = content.xpath('//*[@id="main"]/main/article/div[3]/div[2]/div/div/nav/ul')[0].text
+        splitted_data = int([x.strip() for x in data.split('\n') if x != ''][-1])
         return splitted_data
+
+
+    def get_detailed_content(self,articles):
+        for article in articles:
+            inner_content = self.get_content_loop(self.check_bot_mark_return_content,article)
+            # subtitle = inner_content.find('h2')[0].text.strip() no subtitle
+            try:
+                body = self.get_article_body(inner_content)
+            except:
+                body = ''
+                pass
+            if body == None: body = ''
+            articles[article]['content'] = body
+        return articles
+
+
+    def get_base_info(self,content):
+        # loops over to find title, link, post date of article,
+        # returns dict which serve as collection to be extended when reaching for details
+        content_with_base_data = {}
+                
+        wanteds = content.xpath('//*[@id="main"]/main/article/div[3]/div[1]/div[2]')
+
+        for i in range(1,len(wanteds[0].absolute_links)+1):
+                try:
+                    title = content.xpath(f'//*[@id="main"]/main/article/div[3]/div[1]/div[2]/div[{i}]/div/div/span[1]')[0].text
+                except: IndexError
+                else:                        
+                        link = self.BASE_PAGE + content.xpath(f'//*[@id="main"]/main/article/div[3]/div[1]/div[2]/div[{i}]/div/div/a/@href')[0]
+                        # date = content.xpath(f'//*[@id="main"]/main/article/div[1]/div/div[2]/div[{i}]/article/a/div/time/text()')[0] no date
+                        content_with_base_data[link] = {'title': title, 'link': link}
+    
+        
+        # str to datetime transformation / no date in content
+        # for pos in content_with_base_data.items():
+        #     pos[1]['post date'] = datetime.datetime.strptime(pos[1]['post date'],"%d/%m/%Y")
+
+        return content_with_base_data
+
+    def get_article_body(self,content):
+        article_body = []
+        # adds body of article to dict returned by get_base_info
+        def test_for_common(paragraph):
+            # check if paragraph is one of common paragraph added to most of articles 
+            commons = [
+                'Recognise this person',
+                'Call us anonymously',
+                'To give information 100% anonymously and',
+                '***Note: Information passed directly to police will not qualify. The reward',
+                'If you have information, please fill in our simple and secure '
+                    ]
+            test = False
+            for common in commons:
+                if common in paragraph:
+                    test = True
+                    return test
+            return test
+
+        body_box = content.xpath('//*[@id="main"]/main/article/div[2]/div/div/div')[0].text
+        body_box_split = [x.strip() for x in body_box.split('\n') if x != '']
+        for elem in body_box_split:
+            # if True == test_for_common(elem):
+            #     continue
+            # else:
+            article_body.append(elem)
+
+        article_body = set(article_body)
+        article_body = '\n'.join([x for x in article_body if x != ''])
+        return article_body
 
 
 class MongoDataProc:     
@@ -246,7 +377,10 @@ if __name__ == '__main__':
 
     my_client = dal.connection
     
-    article_processor = ArticlesContent(my_client)
-    article_processor.main()
+    # article_processor = ArticlesContent(my_client)
+    # article_processor.main()
 
-# https://crimestoppers-uk.org/give-information/most-wanted
+    most_wanted_processor = MostWantedContent(my_client)
+    most_wanted_processor.main()
+
+
