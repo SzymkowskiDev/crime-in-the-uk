@@ -1,0 +1,29 @@
+on: push
+name: Test and build containers
+
+jobs:
+  build:
+    name: Build containers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build containers
+        working-directory: app
+        run: docker-compose up --build -d
+
+      - name: Sleep (wait for containers to be ready to check)
+        run: sleep 60
+
+      - name: Check mongo_raw status
+        run: '[[ $(docker inspect mongo_raw --format="{{.State.Health.Status}}") == "healthy" ]] && exit 0 || exit 1'
+
+      - name: Check postgres_final status
+        run: '[[ $(docker inspect postgres_final --format="{{.State.Health.Status}}") == "healthy" ]] && exit 0 || exit 1'
+
+      - name: Check fastapi-api status
+        run: '[[ $(docker inspect fastapi-api --format="{{.State.Health.Status}}") == "healthy" ]] && exit 0 || exit 1'
+
+      - name: Check ingestor_to_raw status
+        run: '[[ $(docker inspect ingestor_to_raw --format="{{.State.Health.Status}}") == "healthy" ]] && exit 0 || exit 1'
