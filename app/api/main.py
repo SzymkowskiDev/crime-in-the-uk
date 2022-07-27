@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from sqlalchemy import select
 from .base import dal
 
-
 app = FastAPI()
 
 if dal.connection == None:
