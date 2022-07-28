@@ -2,10 +2,8 @@ import time
 import datetime
 from requests_html import HTMLSession, HTML
 import re
-try: from .base import dal
-except: pass
-try: from base import dal
-except: pass
+from base import dal
+from pymongo import errors, MongoClient
 
 
 class ArticlesContent:
@@ -15,16 +13,49 @@ class ArticlesContent:
     def __init__(self,mongo_client):
         self.mongo_client = mongo_client
 
+    def check_connection(self) -> None:
+        """
+        Validator - checks connection for DELAY_LITERATIONS*DELAY_UNIT seconds
+        if there is a reconnection to the database. If not, raise error.
+        """
+
+        DELAY_LITERATIONS = 10 #loops
+        DELAY_UNIT = 1 #Sec per iteration
+
+        for _ in range(DELAY_LITERATIONS):
+            time.sleep(DELAY_UNIT)
+            try:
+                self.mongo_client.server_info()
+            except errors.ServerSelectionTimeoutError:
+                dal.mongo_init()
+            else:
+                break
+        try:
+            self.mongo_client.server_info()
+        except errors.ServerSelectionTimeoutError as error:
+            raise error
+
+
+    def connection(self) -> MongoClient:
+        """
+        Connection to mongo db with checker, which checks connection status
+        """
+        self.check_connection()
+        return self.mongo_client
+
+
     def main(self):
             # implement limit with envNs
         last_page = self.get_last_page(
                         self.get_content_loop(
                             self.check_bot_mark_return_content,'https://crimestoppers-uk.org/campaigns-media/news?page=2')
                         )
-        
-        mongo = MongoForArticles(self.mongo_client)
+
+
+        mongo = MongoForArticles(self.connection())
 
         for page in range(1,last_page+1):
+            self.check_connection()
             result = []        
             # base_html = get_base_search_page_content(base_search_page)
             start_page = f'https://crimestoppers-uk.org/campaigns-media/news?page={page}'
@@ -217,5 +248,3 @@ if __name__ == '__main__':
     
     article_processor = ArticlesContent(my_client)
     article_processor.main()
-
-
