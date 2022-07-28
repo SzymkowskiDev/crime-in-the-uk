@@ -15,13 +15,14 @@ class ArticlesContent:
 
     def check_connection(self) -> None:
         """
-        Validator - checks connection for DELAY_LITERATIONS*DELAY_UNIT seconds if there is a reconnection to the database. If not, raise error
+        Validator - checks connection for DELAY_LITERATIONS*DELAY_UNIT seconds
+        if there is a reconnection to the database. If not, raise error.
         """
 
         DELAY_LITERATIONS = 10 #loops
         DELAY_UNIT = 1 #Sec per iteration
 
-        for x in range(DELAY_LITERATIONS):
+        for _ in range(DELAY_LITERATIONS):
             time.sleep(DELAY_UNIT)
             try:
                 self.mongo_client.server_info()
